@@ -1,0 +1,338 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+body {
+
+    background-color: #cccccc;
+}
+canvas {
+    border:20px solid blue;
+    background-color: cyan;
+}
+
+h1 {
+  font-size: 40px;
+  font-family:'Courier New';
+}
+p {
+    
+font-family:'Courier New';
+
+
+}
+
+p2 {
+  font-size: 70px;
+  font-family: "Lucida Console", "Courier New", monospace;
+  color: cyan;
+}
+
+button {
+  background-color: #169b95; 
+  font-family: "Lucida Console", "Courier New", monospace;
+  border: none;
+  color: white;
+  padding: 16px 8px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+}
+button2 {
+  background-color: #086965 ;
+  font-family: "Lucida Console", "Courier New", monospace;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+}
+button3 {
+  background-color: #15c4bc;
+  font-family: "Lucida Console", "Courier New", monospace;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+}
+
+div {
+    font-family: "Lucida Console", "Courier New", monospace;
+}
+a {
+     background-color: #e66157; 
+  font-family: "Lucida Console", "Courier New", monospace;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+a1 {
+     background-color: #ba2f25; 
+  font-family: "Lucida Console", "Courier New", monospace;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+</style>
+</head>
+<body onload="startGame()">
+
+<script>
+
+var myGamePiece;
+var myObstacles = [];
+var myScore;
+
+function startGame() {
+    myGamePiece = new component(30, 20, "yellow", 10, 120);
+    myGamePiece.gravity = 0.05;
+    myScore = new component("30px", "Comic Sans", "black", 10, 30, "text");
+    myGameArea.start();
+}
+
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = window.innerWidth-70;
+        this.canvas.height = 500;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.frameNo = 0;
+        this.interval = setInterval(updateGameArea, 20);
+        },
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+function component(width, height, color, x, y, type) {
+    this.type = type;
+    this.score = 0;
+    this.width = width;
+    this.height = height;
+    this.speedX = .06;
+    this.speedY = 2;    
+    this.x = x;
+    this.y = y;
+    this.gravity = 0;
+    this.gravitySpeed = 0;
+    this.update = function() {
+        ctx = myGameArea.context;
+        if (this.type == "text") {
+            ctx.font = this.width + " " + this.height;
+            ctx.fillStyle = color;
+            ctx.fillText(this.text, this.x, this.y);
+        } else {
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+    this.newPos = function() {
+        this.gravitySpeed += this.gravity;
+        this.x += this.speedX;
+        this.y += this.speedY + this.gravitySpeed;
+        this.hitBottom();
+    }
+    this.hitBottom = function() {
+        var rockbottom = myGameArea.canvas.height - this.height;
+        if (this.y > rockbottom) {
+            this.y = rockbottom;
+            this.gravitySpeed = 0;
+        }
+    }
+    this.hittop = function() {
+        var top = this.canvas.width;
+        if (this.x < top) {
+            this.x = top;
+            this.gravitySpeed = 0;
+            
+
+        }
+    }
+
+    this.crashWith = function(otherobj) {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+            crash = false;
+        }
+        return crash;
+    }
+}
+
+function updateGameArea() {
+    var x, height, gap, minHeight, maxHeight, minGap, maxGap;
+    for (i = 0; i < myObstacles.length; i += 1) {
+        if (myGamePiece.crashWith(myObstacles[i])) {
+            return;
+        } 
+    }
+    myGameArea.clear();
+    myGameArea.frameNo += 1;
+    if (myGameArea.frameNo == 1 || everyinterval(150)) {
+        x = myGameArea.canvas.width;
+        minHeight = 20;
+        spawn = myGameArea.canvas.width/4;
+        spawn2 = myGameArea.canvas.width/2;
+        spawn3 = myGameArea.canvas.width;
+        maxHeight = 200;
+        height = Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
+        minGap = 100;
+        maxGap = 200;
+        gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
+        myObstacles.push(new component(30, height, "green", spawn, 0));
+        myObstacles.push(new component(30, x - height - gap, "chartreuse", spawn, height + gap));
+        myObstacles.push(new component(30, height, "green", spawn2, 0));
+        myObstacles.push(new component(30, x - height - gap, "chartreuse", spawn2, height + gap));
+        myObstacles.push(new component(30, height, "green", spawn3, 0));
+        myObstacles.push(new component(30, x - height - gap, "chartreuse", spawn3, height + gap));
+        myObstacles.push(new component(99999999, 1, "blue", -999999,myGameArea.canvas.height ));
+        myObstacles.push(new component(10000000000000, 9999999, "red", myGameArea.canvas.width*3,1));
+    
+    }
+    
+    function cheat() {
+        while (score >= 50){
+            myObstacles.push(new component(99999999, 100, "red", -999999,myGameArea.canvas.height ));
+        
+
+        } 
+    } 
+
+    for (i = 0; i < myObstacles.length; i += 1) {
+        myObstacles[i].x += -1;
+        myObstacles[i].update();
+    }
+    myScore.text="SCORE: " + myGameArea.frameNo;
+    myScore.update();
+    myGamePiece.newPos();
+    myGamePiece.update();
+}
+
+function everyinterval(n) {
+    if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+    return false;
+}
+
+function accelerate(n) {
+    
+    myGamePiece.gravity = n;
+}
+
+function cheatbarrier() {
+    myObstacles.push(new component(99999999, 1, "blue", -999999,1 ));
+    accelerate(.5);
+
+}
+function die() {
+    myObstacles.push(new component(99999999, 99999999, "red", 1,100 ));
+    alert("nope");
+}
+
+function respawn() {
+    location.reload();
+
+}
+function turbo(){
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+    myGameArea.frameNo*=4096
+}
+
+</script>
+<p></p>
+<button onmousedown="accelerate(-.15)" onmouseup="cheatbarrier()">JUMP_UPJUMP_UPJUMP_UPJUMP_UPJUMP_UPJUMP_UPJUMP_UPJUMP_UPJUMP_UPJUMP_UPJUMP_UPJUMP_UPJUMP_UPJUMP_UPJUMP_UP</button>
+
+<h1>PRESS THE RIGHT BUTTON FOR EXTRA POINTS</h1>
+<button onmousedown="die()">1</button>
+<button onmousedown="die()">2</button>
+<button onmousedown="die()">3</button>
+<button onmousedown="die()">4</button>
+<button onmousedown="die()">5</button>
+<button onmousedown="die()">6</button>
+<button onmousedown="die()">7</button>
+<button onmousedown="die()">8</button>
+<button onmousedown="die()">1</button>
+<button onmousedown="die()">2</button>
+<button onmousedown="die()">3</button>
+<button onmousedown="die()">4</button>
+<button onmousedown="die()">5</button>
+<button onmousedown="turbo()">6</button>
+<button onmousedown="die()">7</button>
+<button onmousedown="die()">8</button>
+<button onmousedown="die()">1</button>
+<button onmousedown="die()">2</button>
+<button onmousedown="die()">3</button>
+<button onmousedown="die()">4</button>
+<button onmousedown="die()">5</button>
+<button onmousedown="die()">6</button>
+<button onmousedown="die()">7</button>
+<button onmousedown="die()">8</button>
+<button onmousedown="die()">1</button>
+<button onmousedown="die()">2</button>
+<button onmousedown="die()">3</button>
+<button onmousedown="die()">4</button>
+<button onmousedown="die()">5</button>
+<button onmousedown="die()">6</button>
+<button onmousedown="die()">7</button>
+<button onmousedown="die()">8</button>
+<hr>
+<button onmousedown="respawn()" onmouseup="respawn()">respawn</button>
+</body>
+</html>

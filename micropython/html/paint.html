@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<!-- saved from url=(0039)https://andrewkhoury.free.nf/paint.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      
+      <title>
+          Web Paint!
+      </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css" id="operaUserStyle"></style></head>
+
+  <body><canvas id="draw" width="1483" height="638"></canvas>
+
+
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+    background-image: url("<img src="https://image.api.playstation.com/vulcan/ap/rnd/202009/2814/GGyEnCkIXoyiVlN9sRHkzUPo.png" alt="DOOM"/>");
+    background-color: #cccccc;
+}
+canvas {
+    border:1px solid blue;
+    background-color: white;
+}
+</style>
+
+
+<form>
+  <label for="color">Select your favorite color:</label>
+  <input type="color" id="color" name="color" value="#ff0000">
+
+</form>
+
+<script>
+var canvas = document.getElementById("draw");
+
+var ctx = canvas.getContext("2d");
+resize();
+
+function resize() {
+  ctx.canvas.width = window.innerWidth-20;
+  ctx.canvas.height = window.innerHeight-100;
+}
+
+var pos = { x: -10, y: -100 };
+
+// new position from mouse events
+function setPosition(e) {
+  pos.x = e.clientX;
+  pos.y = e.clientY;
+}
+
+function draw(e) {
+  if (e.buttons !== 1) return; // if mouse is not clicked, do not go further
+
+  var color = document.getElementById("color").value;
+
+  ctx.beginPath(); // begin the drawing path
+
+  ctx.lineWidth = 20; // width of line
+  ctx.lineCap = "round"; // rounded end cap
+  ctx.strokeStyle = color; // hex color of line
+
+  ctx.moveTo(pos.x, pos.y); // from position
+  setPosition(e);
+  ctx.lineTo(pos.x, pos.y); // to position
+
+  ctx.stroke(); // draw it!
+}
+
+
+// add window event listener to trigger when window is resized
+window.addEventListener("resize", resize);
+
+// add event listeners to trigger on different mouse events
+document.addEventListener("mousemove", draw);
+document.addEventListener("mousedown", setPosition);
+document.addEventListener("mouseenter", setPosition);
+function respawn() {
+    location.reload();
+
+}
+function minus() {
+    ctx.lineWidth-=2
+
+}
+function plus() {
+    ctx.lineWidth+=2
+
+}
+</script>
+<button onmousedown="respawn()">reset</button>
+
+</body></html>
